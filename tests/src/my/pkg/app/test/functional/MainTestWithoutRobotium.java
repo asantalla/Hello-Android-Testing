@@ -1,36 +1,45 @@
 package my.pkg.app.test.functional;
 
-import android.os.SystemClock;
+import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.MotionEvent;
+import android.test.UiThreadTest;
 import android.widget.Button;
 import android.widget.TextView;
 import my.pkg.app.Main;
 import my.pkg.app.R;
 
 public class MainTestWithoutRobotium extends ActivityInstrumentationTestCase2<Main> {
+    private Activity activity;
+    public TextView textView;
+    public Button button;
 
     public MainTestWithoutRobotium() {
         super("my.pkg.app", Main.class);
     }
 
-    public void testTextViewTextIsCorrect() {
-        TextView textView = (TextView) getActivity().findViewById(R.id.textView);
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
 
+        activity = getActivity();
+        assertNotNull(activity);
+        button = (Button) activity.findViewById(R.id.button);
+        assertNotNull(button);
+        textView = (TextView) activity.findViewById(R.id.textView);
+        assertNotNull(textView);
+    }
+
+    public void testTextViewTextIsCorrect() {
         assertEquals("Hello World!", textView.getText());
     }
 
-    public void testButtonTextIsCorrect() {
-        Button button = (Button) getActivity().findViewById(R.id.button);
-
+    public void testSayGoodByeButtonTextIsCorrect() {
         assertEquals("Say Good Bye!", button.getText());
     }
 
-    public void testButtonAction() {
-        Button button = (Button) getActivity().findViewById(R.id.button);
-        long downTime = SystemClock.uptimeMillis();
-        long upTime = SystemClock.uptimeMillis();
-        MotionEvent.obtain(downTime, upTime, MotionEvent.ACTION_DOWN, button.getScrollX(), button.getScrollY(), 0);
-        assertEquals("Say Good Bye!", button.getText());
+    @UiThreadTest
+    public void testPressSayGoodByeButton() {
+        button.performClick();
+        assertEquals("Good Bye World!", textView.getText());
     }
 }
